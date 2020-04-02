@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="activity_horizontal_margin_of_icon">40dp</dimen>
+    <dimen name="activity_horizontal_margin_of_textView">15dp</dimen>
+    <dimen name="activity_vertical_margin_of_linearview">50dp</dimen>
+    <dimen name="activity_textView_size">17sp</dimen>
+
+
+</resources>
