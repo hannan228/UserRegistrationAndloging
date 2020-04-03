@@ -263,5 +263,53 @@
             android:textColor="@color/design_default_color_on_secondary" />
     </androidx.cardview.widget.CardView>
 
+    <ImageView
+        android:id="@+id/leftLoweView"
+        android:layout_width="191dp"
+        android:layout_height="65dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/drowningImageAndLableCardViewID"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/right" />
+
+    <ImageView
+        android:id="@+id/rightLoweView"
+        android:layout_width="191dp"
+        android:layout_height="65dp"
+        android:layout_marginStart="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.933"
+        app:layout_constraintStart_toEndOf="@+id/leftLoweView"
+        app:srcCompat="@drawable/left" />
+
+    <ImageView
+        android:id="@+id/mapIcon"
+        android:layout_width="99dp"
+        android:layout_height="53dp"
+        android:src="@drawable/map"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/leftLoweView"
+        app:layout_constraintHorizontal_bias="0.26"
+        app:layout_constraintStart_toStartOf="@+id/leftLoweView"
+        app:layout_constraintTop_toTopOf="@+id/leftLoweView"
+        app:layout_constraintVertical_bias="0.97"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/callIcon"
+        android:layout_width="108dp"
+        android:layout_height="54dp"
+        android:src="@drawable/call"
+        app:layout_constraintBottom_toBottomOf="@+id/rightLoweView"
+        app:layout_constraintEnd_toEndOf="@+id/rightLoweView"
+        app:layout_constraintHorizontal_bias="0.77"
+        app:layout_constraintStart_toStartOf="@+id/rightLoweView"
+        app:layout_constraintTop_toTopOf="@+id/rightLoweView"
+        app:layout_constraintVertical_bias="1.0"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

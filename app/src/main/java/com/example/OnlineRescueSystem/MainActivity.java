@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
                     ex.printStackTrace();
                 } finally {
 
-                    Intent intent = new Intent(MainActivity.this,RegisterActivity.class);
+                    Intent intent = new Intent(MainActivity.this,DashBoardLayout.class);
                     startActivity(intent);
                 }
             }};th.start();
