@@ -3,12 +3,10 @@ package com.example.OnlineRescueSystem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,29 +14,68 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 public class DashBoardLayout extends AppCompatActivity implements View.OnClickListener{
 
-    private ImageView leftlowerView_map;
+   // private CardView accidentCardView, fireCardView, medicalCardView, crimeCardView, drowningCardView, structureCollapseCardView;
     private static final int Request_Call = 1;
     private String accidentType = null ;
-//    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
 
-        //map click listner
-        leftlowerView_map = findViewById(R.id.leftLoweView);
-        leftlowerView_map.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(DashBoardLayout.this,MapsActivity.class);
-                startActivity(intent);
-            }
-        });
+//        accidentCardView = findViewById(R.id.accidentImageAndLableCardViewID);
+//        fireCardView = findViewById(R.id.fireImageAndLableCardViewID);
+//        medicalCardView = findViewById(R.id.medicalImageAndLableCardViewID);
+//        crimeCardView = findViewById(R.id.crimeImageAndLableCardViewID);
+//        drowningCardView = findViewById(R.id.drowningImageAndLableCardViewID);
+//        structureCollapseCardView = findViewById(R.id.structureCollapseImageAndLableCardViewID);
+//
+//
+//        accidentCardView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(DashBoardLayout.this, "Accident", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//        fireCardView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(DashBoardLayout.this, "Fire", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//        medicalCardView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(DashBoardLayout.this, "Medical", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//        crimeCardView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(DashBoardLayout.this, "Crime", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//        drowningCardView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(DashBoardLayout.this, "Drowning", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//        structureCollapseCardView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(DashBoardLayout.this, "Structure COllapse", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+
     }
 
     @Override
@@ -67,9 +104,6 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
                 open("Building collapse case");
                 break;
 
-//            case (R.id.leftLoweView):
-//                open("call icon case");
-//                break;
         }
     }
 
@@ -77,7 +111,7 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
     public void open(String type) {
         accidentType = type;
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("Are you sure, You wanted to make a call to 'Rescue 1122'");
+        alertDialogBuilder.setMessage("Are you sure, You wanted to make a call to ::Rescue 1122::");
         alertDialogBuilder.setPositiveButton("yes",
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -135,7 +169,4 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
         getMenuInflater().inflate(R.menu.login_profile, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
-
-
 }
