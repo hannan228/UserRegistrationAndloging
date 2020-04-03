@@ -45,8 +45,8 @@
         android:background="@drawable/border"
         android:ems="10"
 
-        android:hint="Phone no."
-        android:inputType="number"
+        android:hint="Email."
+        android:inputType="text"
         android:padding="20dip"
         android:textColor="#FFFFFF"
         android:textColorHint="#FFFFFF"
@@ -79,15 +79,14 @@
         android:layout_width="279dp"
         android:layout_height="58dp"
         android:background="@drawable/border"
-        android:textColor="@color/colorPrimary"
         android:backgroundTint="@color/colorWhiteGray"
         android:text="Register"
+        android:textColor="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addressEditTextID"
-        app:layout_constraintVertical_bias="0.200000024" />
+        app:layout_constraintVertical_bias="0.659" />
 
     <EditText
         android:id="@+id/addressEditTextID"
@@ -105,5 +104,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/CNICEditTextID"
         app:layout_constraintVertical_bias="0.29000002" />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="279dp"
+        android:layout_height="58dp"
+        android:background="@drawable/border"
+        android:ems="10"
+        android:hint="password"
+        android:inputType="textPassword"
+        android:padding="20dip"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addressEditTextID"
+        app:layout_constraintVertical_bias="0.081" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
