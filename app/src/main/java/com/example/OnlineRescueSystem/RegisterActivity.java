@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -46,6 +48,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Uri mImageUri;
     private StorageReference mStorageRef;
 
+    private TextView towardsLoginTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +61,6 @@ public class RegisterActivity extends AppCompatActivity {
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mPostDatabase = FirebaseDatabase.getInstance().getReference().child("Caller Data");
 
-
         image = findViewById(R.id.profile_image);
         name = findViewById(R.id.nameEditTextID);
         phoneNumber = findViewById(R.id.phoneEditTextNoID);
@@ -66,6 +68,17 @@ public class RegisterActivity extends AppCompatActivity {
         address = findViewById(R.id.addressEditTextID);
         mpassword = findViewById(R.id.password);
         registerButton = findViewById(R.id.registerButtonID);
+        towardsLoginTextView = (TextView) findViewById(R.id.towardsLoginTextView);
+
+        towardsLoginTextView.setPaintFlags(towardsLoginTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+//        registerTextView.setText(Html.fromHtml("<u>underlined</u> text"));
+        towardsLoginTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RegisterActivity.this,LoginScreen.class);
+                startActivity(intent);
+            }
+        });
 
         image.setOnClickListener(new View.OnClickListener() {
             @Override
