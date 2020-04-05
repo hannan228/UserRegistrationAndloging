@@ -11,9 +11,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,7 +54,14 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Hide Action bar and Title
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_register);
+        getSupportActionBar().hide();
+
 
         mProgress = new ProgressDialog(this);
         mAuth = FirebaseAuth.getInstance();
@@ -61,14 +69,14 @@ public class RegisterActivity extends AppCompatActivity {
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mPostDatabase = FirebaseDatabase.getInstance().getReference().child("Caller Data");
 
-        image = findViewById(R.id.profile_image);
-        name = findViewById(R.id.nameEditTextID);
-        phoneNumber = findViewById(R.id.phoneEditTextNoID);
-        CNIC = findViewById(R.id.CNICEditTextID);
-        address = findViewById(R.id.addressEditTextID);
+        image = findViewById(R.id.profileImage_register);
+        name = findViewById(R.id.nameEditTextID_register);
+        phoneNumber = findViewById(R.id.phoneEditTextNoID_register);
+        CNIC = findViewById(R.id.CNICEditTextID_register);
+        address = findViewById(R.id.addressEditTextID_register);
         mpassword = findViewById(R.id.password);
-        registerButton = findViewById(R.id.registerButtonID);
-        towardsLoginTextView = (TextView) findViewById(R.id.towardsLoginTextView);
+        registerButton = findViewById(R.id.loginButtonID_login);
+        towardsLoginTextView = (TextView) findViewById(R.id.towardsLoginTextView_register);
 
         towardsLoginTextView.setPaintFlags(towardsLoginTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 //        registerTextView.setText(Html.fromHtml("<u>underlined</u> text"));

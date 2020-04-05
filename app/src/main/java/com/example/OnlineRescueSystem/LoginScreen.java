@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -17,10 +19,16 @@ public class LoginScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login_screen);
 
-        registerbutton = (Button) findViewById(R.id.registerButtonID);
-        registerTextView = (TextView) findViewById(R.id.registerTextViewID);
+        //Hide Action bar and Title
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        setContentView(R.layout.activity_login_screen);
+        getSupportActionBar().hide();
+
+        registerbutton = (Button) findViewById(R.id.loginButtonID_login);
+        registerTextView = (TextView) findViewById(R.id.registerTextViewID_login);
 
         ////registerTextView clickListener
         registerTextView.setPaintFlags(registerTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);

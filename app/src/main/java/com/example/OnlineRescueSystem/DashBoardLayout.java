@@ -3,6 +3,7 @@ package com.example.OnlineRescueSystem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -18,7 +19,7 @@ import android.widget.Toast;
 
 public class DashBoardLayout extends AppCompatActivity implements View.OnClickListener{
 
-   // private CardView accidentCardView, fireCardView, medicalCardView, crimeCardView, drowningCardView, structureCollapseCardView;
+    private View leftLowerViewForMap;
     private static final int Request_Call = 1;
     private String accidentType = null ;
     @Override
@@ -26,56 +27,14 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
 
-//        accidentCardView = findViewById(R.id.accidentImageAndLableCardViewID);
-//        fireCardView = findViewById(R.id.fireImageAndLableCardViewID);
-//        medicalCardView = findViewById(R.id.medicalImageAndLableCardViewID);
-//        crimeCardView = findViewById(R.id.crimeImageAndLableCardViewID);
-//        drowningCardView = findViewById(R.id.drowningImageAndLableCardViewID);
-//        structureCollapseCardView = findViewById(R.id.structureCollapseImageAndLableCardViewID);
-//
-//
-//        accidentCardView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(DashBoardLayout.this, "Accident", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        fireCardView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(DashBoardLayout.this, "Fire", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        medicalCardView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(DashBoardLayout.this, "Medical", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        crimeCardView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(DashBoardLayout.this, "Crime", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        drowningCardView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(DashBoardLayout.this, "Drowning", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        structureCollapseCardView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(DashBoardLayout.this, "Structure COllapse", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
+        leftLowerViewForMap = findViewById(R.id.leftLoweViewForMap);
+        leftLowerViewForMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DashBoardLayout.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
