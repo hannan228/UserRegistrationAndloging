@@ -39,6 +39,25 @@
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent" />
 
+
+    <EditText
+        android:id="@+id/password_login"
+        android:layout_width="@dimen/activity_register_edittext_width"
+        android:layout_height="@dimen/activity_register_edittext_hight"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/border"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:paddingLeft="@dimen/activity_register_edittext_padding_left"
+        android:textColor="@color/colorWhite"
+        android:textColorHint="@color/colorWhite"
+        app:layout_constraintBottom_toTopOf="@+id/loginButtonID_login"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
     <Button
         android:id="@+id/loginButtonID_login"
         android:layout_width="@dimen/activity_register_edittext_width"
@@ -67,22 +86,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loginButtonID_login"
         app:layout_constraintVertical_bias="0.054" />
-
-    <EditText
-        android:id="@+id/password_login"
-        android:layout_width="@dimen/activity_register_edittext_width"
-        android:layout_height="@dimen/activity_register_edittext_hight"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/border"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:paddingLeft="@dimen/activity_register_edittext_padding_left"
-        android:textColor="@color/colorWhite"
-        android:textColorHint="@color/colorWhite"
-        app:layout_constraintBottom_toTopOf="@+id/loginButtonID_login"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

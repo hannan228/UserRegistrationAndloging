@@ -68,7 +68,7 @@
 
             <TextView
                 android:id="@+id/CNICEditTextID_profile"
-                android:text="Abdullah Jafar"
+                android:text="your name..."
                 android:layout_width="320dp"
                 android:layout_height="40dp"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin_of_textView"
@@ -94,7 +94,7 @@
 
             <TextView
                 android:id="@+id/phonNoID_profile"
-                android:text="3520345454541"
+                android:text="03..."
                 android:layout_width="320dp"
                 android:layout_height="40dp"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin_of_textView"
@@ -124,7 +124,7 @@
                 android:layout_height="40dp"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin_of_textView"
                 android:padding="10dip"
-                android:text="3338899444"
+                android:text="your email..."
                 android:textColor="#000000"
                 android:textSize="@dimen/activity_textView_size" />
         </LinearLayout>
@@ -151,7 +151,7 @@
                 android:layout_marginTop="2dp"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin_of_textView"
                 android:padding="10dp"
-                android:text="Wafaqi Colony, Johar town Lahore"
+                android:text="your address..."
                 android:textColor="#000000"
                 android:textSize="@dimen/activity_textView_size" />
         </LinearLayout>

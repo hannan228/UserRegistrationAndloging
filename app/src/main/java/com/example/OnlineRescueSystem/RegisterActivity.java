@@ -37,12 +37,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private CircleImageView image;
-    private EditText name, CNIC, phoneNumber, address,mpassword;
-    private Button registerButton;
+    private CircleImageView imageRegister;
+    private EditText FullnameRegister,passwordRegister,phoneNumberRegister,emailRegister,addressRegister;
+    private Button registerButtonRegister;
 
     private DatabaseReference mPostDatabase;
     private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener firebaseAuthListener;
     private FirebaseUser mUser;
     private ProgressDialog mProgress;
     private static final int GALLERY_CODE = 1;
@@ -66,16 +67,26 @@ public class RegisterActivity extends AppCompatActivity {
         mProgress = new ProgressDialog(this);
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
+        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null){
+                    return;
+                }
+            }
+        };
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mPostDatabase = FirebaseDatabase.getInstance().getReference().child("Caller Data");
 
-        image = findViewById(R.id.profileImage_register);
-        name = findViewById(R.id.nameEditTextID_register);
-        phoneNumber = findViewById(R.id.phoneEditTextNoID_register);
-        CNIC = findViewById(R.id.CNICEditTextID_register);
-        address = findViewById(R.id.addressEditTextID_register);
-        mpassword = findViewById(R.id.password);
-        registerButton = findViewById(R.id.loginButtonID_login);
+        imageRegister = findViewById(R.id.profileImage_register);
+        FullnameRegister = findViewById(R.id.nameEditTextID_register);
+        phoneNumberRegister = findViewById(R.id.CNICEditTextID_register);
+        emailRegister = findViewById(R.id.phoneEditTextNoID_register);
+        addressRegister = findViewById(R.id.addressEditTextID_register);
+        passwordRegister = findViewById(R.id.password_register);
+        registerButtonRegister = findViewById(R.id.loginButtonID_register);
+
         towardsLoginTextView = (TextView) findViewById(R.id.towardsLoginTextView_register);
 
         towardsLoginTextView.setPaintFlags(towardsLoginTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -83,12 +94,13 @@ public class RegisterActivity extends AppCompatActivity {
         towardsLoginTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(RegisterActivity.this,LoginScreen.class);
+                Intent intent = new Intent(RegisterActivity.this, LoginScreen.class);
                 startActivity(intent);
+                finish();
             }
         });
 
-        image.setOnClickListener(new View.OnClickListener() {
+        imageRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -97,75 +109,60 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        registerButton.setOnClickListener(new View.OnClickListener() {
+        registerButtonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String email = phoneNumber.getText().toString();
-                final String password = mpassword.getText().toString();
-                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (!task.isSuccessful()) {
-                            Toast.makeText(RegisterActivity.this, "Not registered/error", Toast.LENGTH_LONG)
-                                    .show();
+                final String email = emailRegister.getText().toString();
+                final String password = passwordRegister.getText().toString();
 
-                        } else {
-                            Toast.makeText(RegisterActivity.this, "Login Success", Toast.LENGTH_LONG)
-                                    .show();
-                            startPosting();
+                if (email != null && password != null) {
+                    if (!TextUtils.isEmpty(emailRegister.getText().toString())
+                            && !TextUtils.isEmpty(passwordRegister.getText().toString())) {
+                        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (!task.isSuccessful()) {
+                                    Toast.makeText(RegisterActivity.this, "something went wrong here...", Toast.LENGTH_LONG)
+                                            .show();
+                                } else {
+                                    startPosting();
+                                }
+                            }
+                        });
+                    } else {
 
-                        }
                     }
-                });
+                }
             }
         });
 
-        //        registerButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                //posting to our database
-//
-//
-//                startPosting();
-//
-//            }
-//        });
-
-//        registerButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(RegisterActivity.this, DashBoardLayout.class);
-//                startActivity(intent);
-//            }
-//        });
-
-    } //  end of on create method
-
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == GALLERY_CODE && resultCode == RESULT_OK) {
             mImageUri = data.getData();
-            image.setImageURI(mImageUri);
+            imageRegister.setImageURI(mImageUri);
         }else{
             Toast.makeText(RegisterActivity.this,"something went wrong...",Toast.LENGTH_LONG).show();
         }
     }
 
     private void startPosting() {
-        mProgress.setMessage("Posting to blog...");
+        mProgress.setMessage("creating account please wait.. ");
         mProgress.show();
 
-        final String mName = name.getText().toString().trim();
-        final String mNumber = phoneNumber.getText().toString().trim();
-        final String mCNIC = CNIC.getText().toString().trim();
-        final String maddress = address.getText().toString().trim();
+        final String mName = FullnameRegister.getText().toString().trim();
+        final String mNumber = phoneNumberRegister.getText().toString().trim();
+        final String mEmail = emailRegister.getText().toString().trim();
+        final String maddress = addressRegister.getText().toString().trim();
 
-
+        mPostDatabase = FirebaseDatabase.getInstance().getReference().child("Caller Data").child(mNumber);
         if (!TextUtils.isEmpty(mName) && !TextUtils.isEmpty(mNumber)
-                && mImageUri != null && !TextUtils.isEmpty(maddress)
-                && !TextUtils.isEmpty(mCNIC)) {
+                && mImageUri != null && !TextUtils.isEmpty(maddress)){
+
+
             // start uploading...
             StorageReference filepath = mStorageRef.child("Caller")
                     .child(mImageUri.getLastPathSegment());
@@ -178,19 +175,22 @@ public class RegisterActivity extends AppCompatActivity {
                     DatabaseReference newPost = mPostDatabase.push();
 
                     Map<String, String> dataToSave = new HashMap<>();
-                    dataToSave.put("CNIC", mCNIC);
                     dataToSave.put("phoneNumber", mNumber);
                     dataToSave.put("name", mName);
                     dataToSave.put("address", maddress);
+                    dataToSave.put("email", mEmail);
                     dataToSave.put("image", downloadUrl.toString());
                     dataToSave.put("timeStamp", String.valueOf(java.lang.System.currentTimeMillis()));
-                    dataToSave.put("userId", mUser.getUid());
+//                    dataToSave.put("userId", mUser.getUid());
 
                     newPost.setValue(dataToSave);
                     mProgress.dismiss();
                     Toast.makeText(RegisterActivity.this,"registered ",Toast.LENGTH_LONG).show();
-                    //foloww
-                    startActivity(new Intent(RegisterActivity.this, Deletable.class));
+
+
+                    Intent ntent = new Intent(RegisterActivity.this, DashBoardLayout.class);
+                    ntent.putExtra("phone Number",mNumber);
+                    startActivity(ntent);
                     finish();
                 }
             });
@@ -199,4 +199,15 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }// end on startPointing
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(firebaseAuthListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mAuth.removeAuthStateListener(firebaseAuthListener);
+    }
 }// end of class

@@ -1,6 +1,7 @@
 package com.example.OnlineRescueSystem;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -14,18 +15,30 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
+import com.example.OnlineRescueSystem.Model.Registration;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 
 public class DashBoardLayout extends AppCompatActivity implements View.OnClickListener{
 
     private View leftLowerViewForMap;
     private static final int Request_Call = 1;
     private String accidentType = null ;
+    private String num;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
+
+        Intent intent = getIntent();
+        num =intent.getStringExtra("phone Number");
+        Toast.makeText(DashBoardLayout.this,""+num,Toast.LENGTH_LONG).show();
 
         leftLowerViewForMap = findViewById(R.id.leftLoweViewForMap);
         leftLowerViewForMap.setOnClickListener(new View.OnClickListener() {
@@ -98,7 +111,7 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
     protected void makeCall() {
 
         Intent callIntent = new Intent(Intent.ACTION_CALL);
-        callIntent.setData(Uri.parse("tel:9875432100"));
+        callIntent.setData(Uri.parse("tel:03451012867"));
 
         if (ContextCompat.checkSelfPermission(DashBoardLayout.this,android.Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(DashBoardLayout.this, new String[]{Manifest.permission.CALL_PHONE},Request_Call); {
@@ -119,13 +132,30 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
             if(grantResults.length>0&& grantResults[0]== PackageManager.PERMISSION_GRANTED){
                 makeCall();
             }else {
-                Toast.makeText(this,"Permison denied",Toast.LENGTH_SHORT);
+                Toast.makeText(this,"Permission denied",Toast.LENGTH_SHORT);
             }
         }
     }
+
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.login_profile, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_profile:
+
+               Intent intent3 = new Intent(DashBoardLayout.this,ProfileActivity.class);
+                intent3.putExtra("Phone Number",num);
+                startActivity(intent3);
+               break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
