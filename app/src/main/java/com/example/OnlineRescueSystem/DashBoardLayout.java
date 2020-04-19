@@ -1,10 +1,8 @@
 package com.example.OnlineRescueSystem;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -14,102 +12,226 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.example.OnlineRescueSystem.Model.Registration;
-import com.google.firebase.database.ChildEventListener;
+import com.example.OnlineRescueSystem.Model.ActiveUser;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 public class DashBoardLayout extends AppCompatActivity implements View.OnClickListener{
 
     private View leftLowerViewForMap;
     private static final int Request_Call = 1;
-    private String accidentType = null ;
-    private String num;
+    private String rescuerType = null ;
+    private FirebaseDatabase database;
+    private DatabaseReference myRef;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener firebaseAuthListener;
+    private FirebaseUser mUser;
+    private static final String TAG = "DashBoardLayout";
+    private String driverType,email,subEmail;
+    private TextView availability,advice;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("ActiveDriver");
+        checkAvailability();
+        availability = findViewById(R.id.availablityy);
+        advice = findViewById(R.id.advicee);
 
-        Intent intent = getIntent();
-        num =intent.getStringExtra("phone Number");
-        Toast.makeText(DashBoardLayout.this,""+num,Toast.LENGTH_LONG).show();
-
-        leftLowerViewForMap = findViewById(R.id.leftLoweViewForMap);
-        leftLowerViewForMap.setOnClickListener(new View.OnClickListener() {
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        subEmail = mUser.getEmail();
+        subEmail = subEmail.substring(0,subEmail.indexOf("."));
+        Log.d(TAG, "onCreate: "+subEmail);
+        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(DashBoardLayout.this, MainActivity.class);
-                startActivity(intent);
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                mUser = firebaseAuth.getCurrentUser();
+                if (mUser != null) {
+                } else {
+
+                    startActivity(new Intent(DashBoardLayout.this,LoginScreen.class));
+                }
+            }
+        };
+
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.d(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+
+                        // Log and toast
+                        //String msg = getString(R.string.msg_token_fmt, token);
+                        Log.d(TAG, "msg"+token);
+                        Toast.makeText(DashBoardLayout.this, "recieved", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        if(subEmail.equals(email)){
+            availability.setText("Available as "+rescuerType);
+            advice.setText("change type of availability by pressing ");
+        }
+
+    } // end of onCreate
+
+    public void checkAvailability(){
+        Log.d(TAG, "onDataChange:ddsdjsnd ");
+        Log.d(TAG, "onDataChange:ref"+myRef);
+
+//        final String subEmail = mUser.getEmail();
+//        subEmail.substring(0, subEmail.indexOf("."));
+
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onDataChange: " + dataSnapshot);
+                if (dataSnapshot.exists()) {
+
+                    for (DataSnapshot child : dataSnapshot.getChildren()) {
+
+                        ActiveUser activeUser = child.getValue(ActiveUser.class);
+                        driverType = activeUser.getDriverType();
+                        email = child.getKey();
+                        Log.d(TAG, "onDataChange: ema"+email);
+                        //assert email != null;
+                        if (subEmail.equals(email)) {
+                            Log.d(TAG, "onDataChange1: " + email);
+                            availability.setText("Available as: "+driverType);
+                            advice.setText("change type of availability by pressing ");
+                            break;
+                        }else
+                        {
+                            Log.d(TAG, "onDataChange:1 vvvv");
+                        }
+                        Log.d(TAG, "onDataChange2: " + driverType);
+                    }
+
+                    //return driverType
+
+                } else {
+                    Toast.makeText(DashBoardLayout.this, "Try later!", Toast.LENGTH_LONG).show();
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError){
+                Log.d(TAG, "onDataChange:" + databaseError.toException());
+
             }
         });
+        //String subEmail = mUser.getEmail();
+
     }
+
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.accidentImageAndLableCardViewID:
-                open("RoadAccident case");
+            case R.id.lifeGuardview:
+                open("life guard service");
                 break;
 
-            case R.id.fireImageAndLableCardViewID:
-                open("Fire case");
-                break;
-            case R.id.medicalImageAndLableCardViewID:
-                open("Medical case ");
+            case R.id.AccidentrecoveryCardView:
+                open("Accident recovery team");
                 break;
 
-            case R.id.crimeImageAndLableCardViewID:
-                open("Crime case");
+            case R.id.fireCardView:
+                open("Fire brigade");
                 break;
 
-            case R.id.drowningImageAndLableCardViewID:
-                open("drowning case");
-                break;
-
-            case (R.id.structureCollapseImageAndLableCardViewID):
-                open("Building collapse case");
+            case R.id.structureCollapseImageAndCardViewID:
+                open("Rescue service");
                 break;
 
         }
     }
 
+    public void open(final String RescuerType){
+        Toast.makeText(DashBoardLayout.this,""+RescuerType,Toast.LENGTH_LONG).show();
+        if (email.equals(subEmail)){
+            Toast.makeText(DashBoardLayout.this,"already available for service",Toast.LENGTH_LONG).show();
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setMessage("It would be replace your old availability. Are you sure to change your type of availability");
+            alertDialogBuilder.setPositiveButton("yes",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            rescuerType = RescuerType;
+                            Intent intent = new Intent(DashBoardLayout.this,MapsActivity.class);
+                            intent.putExtra("rescuerType",rescuerType);
+                            startActivity(intent);
+                        }
+                    });
 
-    public void open(String type) {
-        accidentType = type;
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("Are you sure, You wanted to make a call to ::Rescue 1122::");
-        alertDialogBuilder.setPositiveButton("yes",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface arg0, int arg1) {
+            alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
 
-                        makeCall();
-                    }
-                });
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(DashBoardLayout.this, "Press yes to change your type of availability", Toast.LENGTH_LONG).show();
+                }
+            });
 
-        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
 
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(DashBoardLayout.this, "You clicked No button", Toast.LENGTH_SHORT).show();
-                Toast.makeText(DashBoardLayout.this, " Press Yes on notification if you need 1122", Toast.LENGTH_LONG).show();
+        }else {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setMessage("Make me available as "+RescuerType);
+            alertDialogBuilder.setPositiveButton("yes",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            rescuerType = RescuerType;
+                            Intent intent = new Intent(DashBoardLayout.this,MapsActivity.class);
+                            intent.putExtra("rescuerType",rescuerType);
+                            startActivity(intent);
 
+                        }
+                    });
 
-                 finish();
-            }
-        });
+            alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
 
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(DashBoardLayout.this, "Press yes to make you Available", Toast.LENGTH_LONG).show();
+                }
+            });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+
+        }
+
+    }
+
+    public void call(View view){
+        makeCall();
     }
 
     protected void makeCall() {
-
+        String caller = "03451012867";
         Intent callIntent = new Intent(Intent.ACTION_CALL);
         callIntent.setData(Uri.parse("tel:03451012867"));
 
@@ -118,11 +240,16 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
 
             }
         }else {
-
             startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:03451012867")));
-
         }
     }
+
+    public void onMapPress(View view){
+        Intent intent = new Intent(DashBoardLayout.this,MapsActivity.class);
+        intent.putExtra("rescuerType",rescuerType);
+        startActivity(intent);
+    }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -138,24 +265,36 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
     }
 
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.login_profile, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
-    
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_profile:
-
-               Intent intent3 = new Intent(DashBoardLayout.this,ProfileActivity.class);
-                intent3.putExtra("Phone Number",num);
-                startActivity(intent3);
-               break;
+                Intent intent = new Intent(DashBoardLayout.this,ProfileActivity.class);
+                startActivity(intent);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(firebaseAuthListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(firebaseAuthListener != null){
+            mAuth.removeAuthStateListener(firebaseAuthListener);
+        }
+    }
+
 }
