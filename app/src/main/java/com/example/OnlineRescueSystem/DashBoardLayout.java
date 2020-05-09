@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -20,6 +21,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.OnlineRescueSystem.Model.ActiveUser;
+import com.example.OnlineRescueSystem.Model.Registration;
+import com.example.OnlineRescueSystem.Model.UserRequest;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,32 +38,67 @@ import com.google.firebase.iid.InstanceIdResult;
 
 public class DashBoardLayout extends AppCompatActivity implements View.OnClickListener{
 
-    private View leftLowerViewForMap;
     private static final int Request_Call = 1;
-    private String rescuerType = null ;
+    private String rescuerType,rescueType1;
     private FirebaseDatabase database;
-    private DatabaseReference myRef;
+    private DatabaseReference mRef,mRef1,myRef3,activeCase,userRef;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
     private FirebaseUser mUser;
     private static final String TAG = "DashBoardLayout";
-    private String driverType,email,subEmail;
+    private String driverType,email,subEmail,userEmail;
     private TextView availability,advice;
+    private int available = 0;
+    private double lat,log;
+    private LatLng callerLatLong;
+    private ProgressDialog mProgress1;
+    private String availableStatus="available";
+    private String phoneNumber = "tel:03048146310";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
+        mProgress1 = new ProgressDialog(DashBoardLayout.this);
         database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("ActiveDriver");
-        checkAvailability();
         availability = findViewById(R.id.availablityy);
         advice = findViewById(R.id.advicee);
-
+        Log.d(TAG, "check point 1");
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
+
         subEmail = mUser.getEmail();
         subEmail = subEmail.substring(0,subEmail.indexOf("."));
+        myRef3 = database.getReference("ActiveDriver").child(subEmail).child("user request");
+        activeCase = database.getReference("Active Case").child(subEmail);
+
+        myRef3.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                Log.d(TAG, "onDataChange: my ref " + myRef3);
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot child : dataSnapshot.getChildren()) {
+
+                        ActiveUser activeUser = child.getValue(ActiveUser.class);
+
+                        lat = Double.parseDouble(activeUser.getLat());
+                        log = Double.parseDouble(activeUser.getLog());
+                        Log.d(TAG, "onDataChange: snapshop4" + lat);// caller info
+                        Log.d(TAG, "onDataChange: snapshop4" + log);// caller info
+
+                    }
+                } else {
+                    Log.d(TAG, "onDataChange: snapshop2" + dataSnapshot);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         Log.d(TAG, "onCreate: "+subEmail);
         firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -87,40 +126,40 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
 
                         // Log and toast
                         //String msg = getString(R.string.msg_token_fmt, token);
-                        Log.d(TAG, "msg"+token);
-                        Toast.makeText(DashBoardLayout.this, "recieved", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "token"+token);
                     }
                 });
 
-        if(subEmail.equals(email)){
-            availability.setText("Available as "+rescuerType);
+        if(available==1){
+            availability.setText("Available as "+driverType);
             advice.setText("change type of availability by pressing ");
         }
 
     } // end of onCreate
 
     public void checkAvailability(){
-        Log.d(TAG, "onDataChange:ddsdjsnd ");
-        Log.d(TAG, "onDataChange:ref"+myRef);
+//        mProgress1.setMessage("please wait... make sure you have internet facility");
+//        mProgress1.show();
 
-//        final String subEmail = mUser.getEmail();
-//        subEmail.substring(0, subEmail.indexOf("."));
+        Log.d(TAG, "onDataChange: "+mRef);
 
-        myRef.addValueEventListener(new ValueEventListener() {
+        mRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.d(TAG, "onDataChange: " + dataSnapshot);
                 if (dataSnapshot.exists()) {
-
                     for (DataSnapshot child : dataSnapshot.getChildren()) {
-
+                        Log.d(TAG, "check point checkavailability");
                         ActiveUser activeUser = child.getValue(ActiveUser.class);
                         driverType = activeUser.getDriverType();
+                        Log.d(TAG, "check point checkavailability driverType"+driverType);
                         email = child.getKey();
                         Log.d(TAG, "onDataChange: ema"+email);
                         //assert email != null;
                         if (subEmail.equals(email)) {
-                            Log.d(TAG, "onDataChange1: " + email);
+                            available = 1;
+                            mRef1 = database.getReference(""+driverType).child(subEmail);
+                            rescuerType = driverType;
+//                            Log.d(TAG, "onDataChange1: " + email);
                             availability.setText("Available as: "+driverType);
                             advice.setText("change type of availability by pressing ");
                             break;
@@ -130,11 +169,10 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
                         }
                         Log.d(TAG, "onDataChange2: " + driverType);
                     }
-
+//                    mProgress1.dismiss();
                     //return driverType
-
                 } else {
-                    Toast.makeText(DashBoardLayout.this, "Try later!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(DashBoardLayout.this, "you are not available for any rescue service make yourself available by pressing button", Toast.LENGTH_LONG).show();
                 }
             }
             @Override
@@ -145,11 +183,13 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
         });
         //String subEmail = mUser.getEmail();
 
-    }
+    }//end of chkAvailability
 
 
     @Override
     public void onClick(View v) {
+        Log.d(TAG, "onClick: availableStatus"+availableStatus);
+        if (availableStatus.equals("available")){
         switch (v.getId()) {
             case R.id.lifeGuardview:
                 open("life guard service");
@@ -166,13 +206,20 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
             case R.id.structureCollapseImageAndCardViewID:
                 open("Rescue service");
                 break;
-
+        }
+        }else if (availableStatus.equals("notAvailable")){
+            Toast.makeText(DashBoardLayout.this,"You have not completed your job yet",Toast.LENGTH_LONG).show();
         }
     }
 
     public void open(final String RescuerType){
+        Log.d(TAG, "check point open");
         Toast.makeText(DashBoardLayout.this,""+RescuerType,Toast.LENGTH_LONG).show();
-        if (email.equals(subEmail)){
+        Log.d(TAG, "open: email"+email);
+        Log.d(TAG, "open: email"+subEmail);
+        if (available==1){
+            Log.d(TAG, "check point available");
+            Log.d(TAG, "open: email"+subEmail);
             Toast.makeText(DashBoardLayout.this,"already available for service",Toast.LENGTH_LONG).show();
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setMessage("It would be replace your old availability. Are you sure to change your type of availability");
@@ -180,10 +227,16 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface arg0, int arg1) {
+                            Log.d(TAG, "open: email "+mRef1.child(""+subEmail));
+
+                            mRef1.removeValue();
                             rescuerType = RescuerType;
                             Intent intent = new Intent(DashBoardLayout.this,MapsActivity.class);
-                            intent.putExtra("rescuerType",rescuerType);
+                            intent.putExtra("rescuer",rescuerType);
                             startActivity(intent);
+                            //        DashBoardLayout.this.getSharedPreferences("YOUR_PREFS", 0).edit().clear().commit();
+                            //finish();
+
                         }
                     });
 
@@ -198,6 +251,7 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
             alertDialog.show();
 
         }else {
+            Log.d(TAG, "check point not available");
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setMessage("Make me available as "+RescuerType);
             alertDialogBuilder.setPositiveButton("yes",
@@ -206,7 +260,8 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
                         public void onClick(DialogInterface arg0, int arg1) {
                             rescuerType = RescuerType;
                             Intent intent = new Intent(DashBoardLayout.this,MapsActivity.class);
-                            intent.putExtra("rescuerType",rescuerType);
+                            intent.putExtra("rescuer",rescuerType);
+                            intent.putExtra("availableStatus",availableStatus);
                             startActivity(intent);
 
                         }
@@ -223,7 +278,6 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
             alertDialog.show();
 
         }
-
     }
 
     public void call(View view){
@@ -231,22 +285,24 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
     }
 
     protected void makeCall() {
-        String caller = "03451012867";
+
         Intent callIntent = new Intent(Intent.ACTION_CALL);
-        callIntent.setData(Uri.parse("tel:03451012867"));
+        callIntent.setData(Uri.parse(phoneNumber));
 
         if (ContextCompat.checkSelfPermission(DashBoardLayout.this,android.Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(DashBoardLayout.this, new String[]{Manifest.permission.CALL_PHONE},Request_Call); {
 
             }
         }else {
-            startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:03451012867")));
+            startActivity(new Intent(Intent.ACTION_CALL, Uri.parse(phoneNumber)));
         }
     }
 
     public void onMapPress(View view){
         Intent intent = new Intent(DashBoardLayout.this,MapsActivity.class);
-        intent.putExtra("rescuerType",rescuerType);
+        intent.putExtra("rescuer",rescuerType);
+        Log.d(TAG, "onMapPress: "+availableStatus);
+        intent.putExtra("availableStatus",availableStatus);
         startActivity(intent);
     }
 
@@ -286,7 +342,51 @@ public class DashBoardLayout extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onStart() {
         super.onStart();
+        mRef = database.getReference("ActiveDriver");
+        mProgress1.setMessage("please wait...");
+        mProgress1.show();
+        checkAvailability();
+        Log.d(TAG, "check point onstart");
         mAuth.addAuthStateListener(firebaseAuthListener);
+        activeCase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    availableStatus = "notAvailable";
+                    Log.d(TAG, "onDataChange:ava"+dataSnapshot);
+                    UserRequest userRequest = dataSnapshot.getValue(UserRequest.class);
+                    userEmail = userRequest.getEmail();
+                    Log.d(TAG, "onDataChange:user "+userRef);
+                    Log.d(TAG, "onDataChang me yha"+dataSnapshot);
+                    userRef = database.getReference("Caller Data").child(""+userEmail).child("profile detail").child("wese");
+
+                    userRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Registration registration = dataSnapshot.getValue(Registration.class);
+                            phoneNumber = "tel:"+(registration.getPhoneNumber());
+                            Log.d(TAG, "onDataChange: hh"+phoneNumber);
+
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                    mProgress1.dismiss();
+                }else {
+                    Log.d(TAG, "onDataChange:not");
+                    mProgress1.dismiss();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
     }
 
     @Override
