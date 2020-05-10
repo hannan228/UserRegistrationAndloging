@@ -43,7 +43,7 @@
             android:layout_marginLeft="25dp"
             android:layout_marginTop="110dp"
             android:foregroundGravity="center"
-            android:text=" life guard"
+            android:text="Life guard"
             android:textAlignment="center"
             android:textColor="@color/design_default_color_on_secondary" />
 

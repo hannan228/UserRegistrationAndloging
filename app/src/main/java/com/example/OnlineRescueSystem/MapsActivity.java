@@ -25,6 +25,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -105,7 +106,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         LatLng driverLocation = new LatLng(lat, log);
 
                         mMap.clear();
-                        mMap.addMarker(new MarkerOptions().position(driverLocation).title("driver is here"));
+                        mMap.addMarker(new MarkerOptions().position(driverLocation).title("driver is here").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ambulance_small)));
 
                         Log.d(TAG, "onLocationChanged: 2"+driverType);
                         Log.d(TAG, "onLocationChanged:3 "+availableStatus);
@@ -157,7 +158,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     longitude = Double.parseDouble(userRequest.getLog());
 
                                                     LatLng callerLtLng = new LatLng(latitude,longitude);
-                                                    mMap.addMarker(new MarkerOptions().position(callerLtLng).title("caller is here2"));
+                                                    mMap.addMarker(new MarkerOptions().position(callerLtLng).title("caller is here"));
                                                 }
                                             }
 
@@ -182,14 +183,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             double dis = distance(lat, log, latitude, longitude);
                             km = dis / 0.62137;
-                            estimatedDistanceMap.setText(""+km+" km");
-
+                            estimatedDistanceMap.setText(new DecimalFormat("##.####").format(km) + " km");
+                            estTime();
 
                         }
 
 
                         callerLatLong = new LatLng(latitude,longitude);
-                        mMap.addMarker(new MarkerOptions().position(callerLatLong).title("caller is here2"));
+                        mMap.addMarker(new MarkerOptions().position(callerLatLong).title("caller is here"));
 
                         locationInfo = new LocationInfo(""+lat,""+log);
                         // LocationInfo locationInfo1 = new LocationInfo();
@@ -214,11 +215,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } else if (lat > 20 && log > 20) {
                     LatLng driverLocation = new LatLng(lat, log);
                     mapTitle.setText("Not available for any service..");
-                    Toast.makeText(MapsActivity.this,"here aggi",Toast.LENGTH_LONG).show();
-                    mMap.animateCamera(CameraUpdateFactory.newLatLng(driverLocation));
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(driverLocation, 16));
                     mMap.clear();
-                    mMap.addMarker(new MarkerOptions().position(driverLocation).title("you are here"));
+                    mMap.addMarker(new MarkerOptions().position(driverLocation).title("driver is here").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ambulance_small)));
 
                     // Log.d(TAG, "empty ");
                 }
@@ -276,13 +274,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return (rad * 180.0 / Math.PI);
     }
 
+    public void estTime(){
+        if (km <= 1) {
+            double time1 = km + 1;
+            estimatedTimeMap.setText(new DecimalFormat("##.##").format(time1) + " min");
+        } else if (km > 1 || km <= 2) {
+            double time1 = km + 2;
+            estimatedTimeMap.setText(new DecimalFormat("##.##").format(time1) + " min");
+        } else if (km > 2 || km <= 4) {
+            double time1 = km + 3;
+            estimatedTimeMap.setText(new DecimalFormat("##.##").format(time1) + " min");
+        } else if (km > 4 || km <= 10) {
+            double time1 = km + 5;
+            estimatedTimeMap.setText(new DecimalFormat("##.##").format(time1) + " min");
+        } else if (km > 10) {
+            double time1 = km + 6;
+            estimatedTimeMap.setText(new DecimalFormat("##.##").format(time1) + " min");
+        }
+    }
+
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         LatLng newLocation = new LatLng(31.177167,74.105169);
         mMap.animateCamera(CameraUpdateFactory.newLatLng(newLocation));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 14));
-        mMap.addMarker(new MarkerOptions().position(newLocation).title("you are here"));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 15));
+        mMap.addMarker(new MarkerOptions().position(newLocation).title("you are here").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ambulance_small)));
 
         //mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
     }
