@@ -17,6 +17,11 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.directions.route.AbstractRouting;
+import com.directions.route.Route;
+import com.directions.route.RouteException;
+import com.directions.route.Routing;
+import com.directions.route.RoutingListener;
 import com.example.OnlineRescueSystem.Model.ActiveUser;
 import com.example.OnlineRescueSystem.Model.DriverType;
 import com.example.OnlineRescueSystem.Model.LocationInfo;
@@ -29,6 +34,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -38,8 +45,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, RoutingListener {
     private GoogleMap mMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -108,9 +117,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         mMap.clear();
                         mMap.addMarker(new MarkerOptions().position(driverLocation).title("driver is here").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ambulance_small)));
 
-                        Log.d(TAG, "onLocationChanged: 2"+driverType);
-                        Log.d(TAG, "onLocationChanged:3 "+availableStatus);
-
 
                         if (availableStatus.equals("available")){
                         myRef3.addValueEventListener(new ValueEventListener() {
@@ -127,8 +133,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         UserRequest userRequest = new UserRequest("" + lat, "" + log, "" + (child.getKey()));
                                         activeCase.setValue(userRequest);
 
-                                        Log.d(TAG, "onDataChange: snapshop4" + child.getKey());// caller info
-                                        Log.d(TAG, "onDataChange: snapshop4" + callerLatLong);// caller info
                                     }
                                 } else {
                                     Log.d(TAG, "onDataChange: here" + dataSnapshot);
@@ -151,8 +155,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 if(dataSnapshot.exists()) {
-                                                    Log.d(TAG, "onLocationChanged: email"+dataSnapshot.getKey());
-                                                    Log.d(TAG, "onLocationChanged:user "+userEmail);
                                                     UserRequest userRequest = dataSnapshot.getValue(UserRequest.class);
                                                     latitude = Double.parseDouble(userRequest.getLat());
                                                     longitude = Double.parseDouble(userRequest.getLog());
@@ -186,6 +188,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             estimatedDistanceMap.setText(new DecimalFormat("##.####").format(km) + " km");
                             estTime();
 
+                            getRouteToMarker(lat,log,latitude,longitude);
+
                         }
 
 
@@ -193,14 +197,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         mMap.addMarker(new MarkerOptions().position(callerLatLong).title("caller is here"));
 
                         locationInfo = new LocationInfo(""+lat,""+log);
-                        // LocationInfo locationInfo1 = new LocationInfo();
-                        //locationInfo1.setLat(""+lat);
-                        Log.d(TAG, "check point maps activity data 1"+driverType);
 
                         driverType1 = new DriverType(""+lat,""+log,""+driverType);
                         activeUser = new ActiveUser(""+lat,""+log,""+driverType);
-
-                        Log.d(TAG, "check point maps activity data 2"+activeUser.getDriverType());
 
 
                         if (i==1) {
@@ -329,4 +328,79 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         myRef2 = database.getReference(driverType+"fuck").child(subEmail);
 
     }
+
+
+    // for draw route between two points from SIM coder
+
+    private void getRouteToMarker(double lat2,double log2, double latitude2, double longitude2){
+        Routing routing = new Routing.Builder()
+                .travelMode(AbstractRouting.TravelMode.DRIVING)
+                .withListener(this)
+                .alternativeRoutes(false)
+                .waypoints(new LatLng(lat2, log2),new LatLng(latitude2,longitude2))
+                .key("AIzaSyDpxqq5fXUcZSaH5SS_Luj2_uRpPxnNDP0")
+                .build();
+        routing.execute();
+    }
+//    .key("AIzaSyD7ZaAsl-7MwVZjnz4uLqysXKJtsjbetHw")
+
+//                .key("AIzaSyBf9crRuyIuaw4fkFt6q_6VEFtPNKJAsHE")
+
+
+
+    private List<Polyline> polylines;
+    private static final int[] COLORS = new int[]{R.color.primary_dark_material_light};
+
+    //when alternative paths needed then following code
+    //private static final int[] COLORS = new int[]{R.color.primary_dark,R.color.primary,R.color.primary_light,R.color.accent,R.color.primary_dark_material_light};
+    // when alternaive paths
+
+
+    @Override
+    public void onRoutingFailure(RouteException e) {
+        if(e != null) {
+            Toast.makeText(this, "Error:onRouting " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }else {
+            Toast.makeText(this, "Something went wrong, Try again", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onRoutingStart() {
+
+    }
+
+    @Override
+    public void onRoutingSuccess(ArrayList<Route> route, int shortestRouteIndex) {
+//        if(polylines.size()>0) {
+//            for (Polyline poly : polylines) {
+//                poly.remove();
+//            }
+//        }
+
+        polylines = new ArrayList<>();
+        //add route(s) to the map.
+        for (int i = 0; i <route.size(); i++) {
+
+            //In case of more than 5 alternative routes
+            int colorIndex = i % COLORS.length;
+
+            PolylineOptions polyOptions = new PolylineOptions();
+            polyOptions.color(getResources().getColor(COLORS[colorIndex]));
+            polyOptions.width(10 + i * 3);
+            polyOptions.addAll(route.get(i).getPoints());
+            Polyline polyline = mMap.addPolyline(polyOptions);
+            polylines.add(polyline);
+
+            Toast.makeText(getApplicationContext(),"Route "+ (i+1) +": distance - "+ route.get(i).getDistanceValue()+": duration - "+ route.get(i).getDurationValue(),Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @Override
+    public void onRoutingCancelled() {
+
+    }
+
+
 }

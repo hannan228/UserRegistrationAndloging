@@ -20,5 +20,8 @@
     Once you have your key (it starts with "AIza"), replace the "google_maps_key"
     string in this file.
     -->
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBi842pGjZntqy1pQxWad8q5tKaIBywL6E</string>
+<!--    AIzaSyBCbjoz-bU5e10QfUWvJWUL4mdmsXlR-2I-->
+<!--    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBi842pGjZntqy1pQxWad8q5tKaIBywL6E</string>--> //  actual
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyCbEy3Y9T1uwnFTo1GdRG18mp7MI67qlBg</string>
+<!--&lt;!&ndash;    https://console.developers.google.com/apis/credentials?authuser=1&project=my-project-276902&ndash;&gt; in uni gmail-->
 </resources>
